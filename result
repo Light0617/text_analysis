@@ -1,0 +1,25 @@
+n = 100, 100
+model1 (with neg, a list of POS)
+C = 10, 0.67
+C = 1,  0.645
+C = -1e5 0.695
+
+base_line
+C = 10, 0.605
+C = 1, 0.605
+C = -1e5, 0.605
+
+-----------
+all data
+model1 
+C = -1e5, 0.5751
+C = 1, 0.5753
+C = 10, 0.5753
+
+Naive_bayes_unigram
+0.5
+
+Naive_bayes_bigram
+0.5
+
+
