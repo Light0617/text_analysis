@@ -179,8 +179,11 @@ class word_processor():
 
 	def get_dependency_features(self, sentence):
 		features = [0]  * 13
-		dep = self.dependency_parser.raw_parse(sentence).next()
-		for modified, rel, modifying in list(dep.triples()):
+		try:
+			dep = list(self.dependency_parser.raw_parse(sentence).next().triples())
+		except:
+			dep = []
+		for modified, rel, modifying in dep:
 			pos1, pos2 = modifying[1], modified[1]
 			modifying, modified = modifying[0], modified[0]
 			#print rel, modifying, modified, pos1, pos2
@@ -251,16 +254,14 @@ class word_processor():
 			print self.lexicon_sad[key], type(self.lexicon_sad[key])
 	
 	def get_features1(self, sentence):
-		neg = self.negation_detect(sentence)
 		sentence = self.normalize(sentence)
 		print sentence
-		return [1] + neg + [self.get_number_word_sentence(sentence)] \
+		#return [1] + self.negation_detect(sentence) + self.get_dependency_features(sentence)
+		return [1] + self.negation_detect(sentence)  + [self.get_number_word_sentence(sentence)] \
 				+ self.get_emotion_word_feature(sentence) + self.get_pos_feature(sentence) \
 				+ self.get_dependency_features(sentence)
 	def get_feature_baseline(self, sentence):
-		sentence = self.normalize(sentence)
-		print sentence
-		return [1] + [self.get_emotion_word_feature(sentence)[-1]]
+		return [1]
 
 if __name__ == '__main__':	
 	wp = word_processor() 
@@ -286,6 +287,7 @@ if __name__ == '__main__':
 	#For testing dependency
 	strs  = ["The dog terribly ran.", "The scold dog ran.",'I have a scold scholar.', 'I have a scold hardness.']
 	#strs  = ["The dog terribly ran."]
+	#strs  = [""]
 	for s in strs:
 		print '================'
 		print s

@@ -5,8 +5,9 @@ This is an application for recognition emotion from context.
 1. Go to https://nlp.stanford.edu/software/tagger.shtml, to download the software. (please install version: 3.8.0) 
 2. install nltk
 3. install numpy 
-5. If you want to train the model, you could request the professor: Saima Aman(http://saimacs.github.io/index.html).
-
+4. put the 'stanford-parser' and 'stanford-postagger' in the parent dictionary.
+5. python get_features.py  for test
+6. run modeling.ipynb 
 
 ## INTRODUCTION
 ### Program 
@@ -34,6 +35,8 @@ Since getting features is very slow, we store the features in the pickles.
 ### Result 
 - result
 It records the performances among different data size and different models.
+for all data(training : 8982, testing : 3848), our result is 0.57 accuracy rate over Naive Bayes 0.5
+
 
 ### OTHER
 - wordnet-1.6/

@@ -19,8 +19,6 @@ def get_feature(word):
 def bag_of_words(words):
 	return dict([(word, True) for word in words])
 
-
-
 def extract_tokens(line, opt = 1):
 	stemmer = PorterStemmer()
 	tokenizer = WordPunctTokenizer()
@@ -35,7 +33,6 @@ def extract_tokens(line, opt = 1):
 		for bigram_tuple in bigrams:
 		    x = "%s %s" % bigram_tuple
 		    tokens.append(x)
-		    print x
 	tokens = [ str(lemma(x).lower()) \
 				for x in tokens
 				if isinstance(x, unicode)
@@ -44,23 +41,13 @@ def extract_tokens(line, opt = 1):
 				and len(wn.synsets(x)) > 0]
 	return tokens
 
-def get_train_data1(trainFile, model):
-	lines = [ line for line in open(trainFile, 'r').readlines()]
+def get_data(train_file, model):
+	lines = [ line for line in open(train_file, 'r').readlines()]
 	opt = 2 if model == 'bigram' else 1
 	tokens = [ (token, int(line.strip('\n').split(',')[1])) for line in lines for token in extract_tokens(line.split(',')[0], opt)]
-	for token in tokens:
-		print token[0], token[1]
+	#for token in tokens:
+	#	print token[0], token[1]
 	train_set = [ (get_feature(token[0]), token[1])  for token in tokens]
-	return train_set
-
-def get_train_data(text, train_ratio):
-	train_set = []
-	for label, file in text.iteritems():
-		print('label...%s' % label)
-		lines = [ line for line in open(file, 'r').readlines()]
-		lines = lines[:(int) (len(lines) * train_ratio)]
-		tokens = [ token for line in lines for token in extract_tokens(line)] 
-		train_set += [(get_feature(token), label) for token in tokens]
 	return train_set
 
 def prediction_NB(infile, model):
@@ -127,32 +114,33 @@ def write_dict(test_file, output_file, external_file):
 			out.write('%s, %f\n' % (word, NB_dict[word]))
 	out.close()
 	
+def build_NB_lexicon(path, output_file):
+	input_file = '%s/all/testData' % (path)
+	external_file = 'external_data/emotion.csv'
+	write_dict(test_file, output_file, external_file)
 
 if __name__ == '__main__':
 	text = {}
-	domain = 'random70'
-	path = 'Data/%s/' % (domain)
-	text['pos'] = '%s/sadList' % (path)
-	text['neg'] = '%s/nonSadList' % (path)
-	trainFile = '%s/trainData' % (path)
-	model = 'bigram'
+	domain = 'random70_all'
+	path = 'Data'
+	train_file = '%s/%s/trainData' % (path, domain)
+	test_file = '%s/%s/testData' % (path, domain)
+	model = 'bigram1'
 	pickled_classifier = 'trained/classifier-NaiveBayes-%s_%s.pickle' % (domain, model)
-
 	if not os.path.exists(pickled_classifier):
 		print 'classifier does not exist, now train and write'
-		train_set = get_train_data1(trainFile, model)
-		#train_set = get_train_data(text, train_ratio)
+		train_set = get_data(train_file, model)
+		print len(train_set)
 		classifier = NaiveBayesClassifier.train(train_set)
 		pickle.dump(classifier, open(pickled_classifier, 'w'))
 	else:
 		classifier = pickle.load(open(pickled_classifier, 'r'))
 
 	#build a NB model and test the performance	
-	test_file = '%s/testData1' % (path)
-	print prediction_NB(test_file, model)
+	#print prediction_NB(test_file, model)
 
-	#output_file = 'sad_lexicon'
-	#external_file = 'external_data/emotion.csv'	
-	#write_dict(test_file, output_file, external_file)
+	#build a NB lexicon
+	#output_file = 'sadList'
+	#build_NB_lexicon(path, output_file)
 
 
