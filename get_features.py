@@ -111,7 +111,7 @@ class word_processor():
 		sentence = ' '.join([x for x in  sentence.split(' ') if x not in stopwords.words('english') and len(x) > 1])
 		items = word_tokenize(sentence)
 		sad, neg, sad_score = 0, 0, -10
-		print items
+		#print items
 		for word in items:
 			if word in self.lexicon:
 				sad = max(self.get_is_sad_word(word), sad)
@@ -155,10 +155,10 @@ class word_processor():
 	def pos_to_list(self, neighbor_pos):
 		list = [self.pos_mapping(pos) for pos in neighbor_pos]
 		array, k = [0] * (36 * 4), 0
-		print neighbor_pos
+		#print neighbor_pos
 		for num in list:
 			if num >= 0:
-				print num, k + num 
+				#print num, k + num 
 				array[k + num] = 1
 			k += 36
 		return array
@@ -255,11 +255,12 @@ class word_processor():
 	
 	def get_features1(self, sentence):
 		sentence = self.normalize(sentence)
-		print sentence
-		#return [1] + self.negation_detect(sentence) + self.get_dependency_features(sentence)
-		return [1] + self.negation_detect(sentence)  + [self.get_number_word_sentence(sentence)] \
+		#print sentence
+		vec =  [1] + self.negation_detect(sentence)  + [self.get_number_word_sentence(sentence)] \
 				+ self.get_emotion_word_feature(sentence) + self.get_pos_feature(sentence) \
 				+ self.get_dependency_features(sentence)
+		#print len(vec)
+		return vec
 	def get_feature_baseline(self, sentence):
 		return [1]
 
@@ -285,9 +286,10 @@ if __name__ == '__main__':
 
 	
 	#For testing dependency
-	strs  = ["The dog terribly ran.", "The scold dog ran.",'I have a scold scholar.', 'I have a scold hardness.']
+	#strs  = ["The dog terribly ran.", "The scold dog ran.",'I have a scold scholar.', 'I have a scold hardness.']
 	#strs  = ["The dog terribly ran."]
 	#strs  = [""]
+	strs  = ["I hate a dog."]
 	for s in strs:
 		print '================'
 		print s

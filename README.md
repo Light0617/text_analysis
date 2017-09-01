@@ -1,13 +1,22 @@
 # text_analysis
 This is an application for recognition emotion from context.
 
-## How to start
+## How to start to build a model
 1. Go to https://nlp.stanford.edu/software/tagger.shtml, to download the software. (please install version: 3.8.0) 
 2. install nltk
 3. install numpy 
 4. put the 'stanford-parser' and 'stanford-postagger' in the parent dictionary.
 5. python get_features.py  for test
 6. run modeling.ipynb 
+
+## How to use, it will output the average sad emotion given a document.
+1. story1 is the text you want to analyze
+python lib.py story1
+
+2. use API
+from lib import *
+print predict_emotion_textList(texts)
+
 
 ## INTRODUCTION
 ### Program 
