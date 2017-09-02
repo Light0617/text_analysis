@@ -8,7 +8,6 @@ def getData(infile):
     lines = [ line for line in open(infile, 'r').readlines()]
     text, Y = [line.split(',')[0] for line in lines], \
                         [int(line.split(',')[1]) for line in lines]
-    print len(text), len(Y)
     wp = word_processor()
     data = [wp.get_features1(x) for x in text]
     return [data, Y]
@@ -25,7 +24,6 @@ def evaluate(logistic, X, Y):
 	return logistic.score(X, Y)
 
 def test_line(wp, logistic, testSetence):
-	#print testSetence
 	vec = np.array(wp.get_features1(testSetence)).reshape(1, -1)
 	return logistic.predict_proba(vec)[0,1]
 
@@ -55,20 +53,16 @@ def get_wp(path, domain):
 	return wp
 
 def predict_emotion_text(wp, logistic, text):
-	lines = ' '.join(line.strip('\n') for line in text)
-	lines = [x for x in re.split('[!.?]+', lines) if len(x) > 0]
+	lines = [x for x in re.split('[!.?]+', text.strip('\n')) if len(x) > 0]
 	scores = 0
 	for line in lines:
 		score = test_line(wp, logistic, line)
-		print line, score
+		print line
+		print score
 		scores += score
 	return scores / float (len(lines))	
 
 def predict_init(path = 'trained/', domain = 'random70_all'):
-	scriptPath = os.path.realpath(os.path.dirname('text_analysis'))
-	print scriptPath
-	os.chdir(scriptPath)
-	print path, domain
 	path = os.getcwd() + '/' + path
 	print path, domain
 	return [get_logistic(path, domain), get_wp(path, domain)]	
