@@ -1,6 +1,7 @@
 #!usr/bin/python
 import numpy as np
 import ast, re, csv
+import os
 from nltk.corpus import stopwords
 from nltk.tokenize import WordPunctTokenizer
 from pattern.en import lemma
@@ -10,7 +11,7 @@ from nltk.parse.stanford import StanfordParser
 from nltk.parse.stanford import StanfordDependencyParser
 from nltk import word_tokenize
 from nltk.tree import *
-#from get_story import *
+from get_story import *
 
 ## for self.lexicon file
 LEXICON_FILE1 = 'lexicon/sad_lexicon'
@@ -25,10 +26,15 @@ class word_processor():
 		self.lexicon = {}	
 
 		## for POS tagger
-		path = '../'
+		path = os.path.abspath('../') + '/'
 		JAR = path + 'stanford-postagger/stanford-postagger.jar'
 		MODEL = path + 'stanford-postagger/models/english-left3words-distsim.tagger'
 		self.pos_tagger = StanfordPOSTagger(MODEL, JAR, encoding='utf8')
+
+		#self.LEXICON_FILE1 = os.getcwd() + '/' + 'lexicon/sad_lexicon'
+		#self.LEXICON_FILE2 = os.getcwd() + '/' + 'lexicon/pos_lexicon'
+		#self.LEXICON_FILE3 = os.getcwd() + '/' + 'lexicon/neg_lexicon'
+
 
 		arguments = {}
 		arguments['--jar']	= path + 'stanford-parser/stanford-parser.jar'
@@ -42,14 +48,18 @@ class word_processor():
 		self.build_sadness_dictionary()
 		self.build_pos_dictionary()
 		self.build_neg_dictionary()
+		print len(self.lexicon)
 
 	def build_sadness_dictionary(self):
+		#self.build_dictionary(self.LEXICON_FILE1, 'sad')
 		self.build_dictionary(LEXICON_FILE1, 'sad')
 	
 	def build_pos_dictionary(self):
+		#self.build_dictionary(self.LEXICON_FILE2, 'pos')
 		self.build_dictionary(LEXICON_FILE2, 'pos')
 
 	def build_neg_dictionary(self):
+		#self.build_dictionary(self.LEXICON_FILE3, 'neg')
 		self.build_dictionary(LEXICON_FILE3, 'neg')
 
 	def build_dictionary(self, infile, label):

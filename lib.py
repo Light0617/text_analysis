@@ -65,6 +65,9 @@ def predict_emotion_text(wp, logistic, text):
 	return scores / float (len(lines))	
 
 def predict_init(path = 'trained/', domain = 'random70_all'):
+	print path, domain
+	path = os.getcwd() + '/' + path
+	print path, domain
 	return [get_logistic(path, domain), get_wp(path, domain)]	
 
 def predict_emotion_textList(textList, path = 'trained/', domain = 'random70_all'):
@@ -87,7 +90,8 @@ if __name__ == '__main__':
 	else:	
 		print predict_emotion_fileList([sys.argv[1]], path, domain)
 	'''
-	texts = [open('story1', 'r').readlines(), open('story1', 'r').readlines()]	
+	texts = [open('story2', 'r').readlines()]
+	#texts = [open('story1', 'r').readlines(), open('story1', 'r').readlines()]	
 	#print predict_emotion_textList(texts, path = path, domain = domain)
 	print predict_emotion_textList(texts)
 	#print predict_emotion_docsList(textList)
