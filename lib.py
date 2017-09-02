@@ -65,6 +65,9 @@ def predict_emotion_text(wp, logistic, text):
 	return scores / float (len(lines))	
 
 def predict_init(path = 'trained/', domain = 'random70_all'):
+	scriptPath = os.path.realpath(os.path.dirname('text_analysis'))
+	print scriptPath
+	os.chdir(scriptPath)
 	print path, domain
 	path = os.getcwd() + '/' + path
 	print path, domain
