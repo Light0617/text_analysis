@@ -1,6 +1,7 @@
 #!usr/bin/python
 import numpy as np
 import ast, re, csv
+import json
 import os
 from nltk.corpus import stopwords
 from nltk.tokenize import WordPunctTokenizer
@@ -48,7 +49,6 @@ class word_processor():
 		self.build_sadness_dictionary()
 		self.build_pos_dictionary()
 		self.build_neg_dictionary()
-		print len(self.lexicon)
 
 	def build_sadness_dictionary(self):
 		#self.build_dictionary(self.LEXICON_FILE1, 'sad')

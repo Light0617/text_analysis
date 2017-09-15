@@ -56,5 +56,30 @@ These all are libraries or external original lexicons.
 
 
 ## REFERENCE
+### Emotion recogizing
 Diman Ghazi , Diana Inkpen , Stan Szpakowicz, Prior and contextual emotion of words in sentential context, Computer Speech and Language, v.28 n.1, p.76-92, January, 2014 
+
+### WordNet
+George A. Miller (1995). WordNet: A Lexical Database for English. 
+Communications of the ACM Vol. 38, No. 11: 39-41. 
+
+Christiane Fellbaum (1998, ed.) WordNet: An Electronic Lexical Database. Cambridge, MA: MIT Press.
+
+### Polarity
+Wilson, T., Wiebe, J., Hoffmann, P.: Recognizing contextual polarity in phrase-level sentiment
+analysis. In: Proceedings of the conference on empirical methods in natural language
+processing (EMNLP 2005), pp. 347–354. Vancouver, B.C., Canada (2005)
+
+Agarwal, Apoorv, et al. "Sentiment analysis of twitter data." Proceedings of the workshop on languages in social media. Association for Computational Linguistics, 2011.
+
+Wilson, Theresa, Janyce Wiebe, and Paul Hoffmann. "Recognizing contextual polarity: An exploration of features for phrase-level sentiment analysis." Computational linguistics 35.3 (2009): 399-433.
+
+Kiritchenko, Svetlana, Xiaodan Zhu, and Saif M. Mohammad. "Sentiment analysis of short informal texts." Journal of Artificial Intelligence Research 50 (2014): 723-762.
+
+Poria, Soujanya, et al. "Sentic patterns: Dependency-based rules for concept-level sentiment analysis." Knowledge-Based Systems 69 (2014): 45-63.
+
+Medhat, Walaa, Ahmed Hassan, and Hoda Korashy. "Sentiment analysis algorithms and applications: A survey." Ain Shams Engineering Journal 5.4 (2014): 1093-1113.
+
+
+
 

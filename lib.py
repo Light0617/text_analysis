@@ -5,12 +5,23 @@ import sys
 from get_features import *
 from sklearn import linear_model, datasets
 def getData(infile):
+    if 'sem' in infile:
+        return getData1(infile)
     lines = [ line for line in open(infile, 'r').readlines()]
     text, Y = [line.split(',')[0] for line in lines], \
                         [int(line.split(',')[1]) for line in lines]
     wp = word_processor()
     data = [wp.get_features1(x) for x in text]
     return [data, Y]
+
+def getData1(infile):
+	lines = [ line for line in open(infile, 'r').readlines()]
+	text, Y = [line.split(',')[0] for line in lines], \
+                        [int(line.split(',')[-2]) > 0 for line in lines]
+	wp = word_processor()
+	data = [wp.get_features1(x) for x in text]
+	return [data, Y]
+	
 
 
 def model1(trainX, trainY, c = 1e5):
