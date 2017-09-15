@@ -37,6 +37,14 @@ I use spark to executing the modeling and prediction we use all features from ge
 - Data/
 - I collect different size of data to do small data test. There are training data and testing data and there data are setence based.
 
+- trainData and testData are from Semeval_2007 (emotions)
+joy, sad, disgust, anger, surprise, fear
+
+# Lexicon
+1. lexicon.json
+anger,anticipation,disgust,fear,joy,negative,positive,sadness,surprise,trust
+ 
+
 ### Pickles
 - trained/
 Since getting features is very slow, we store the features in the pickles.
