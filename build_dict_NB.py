@@ -36,8 +36,8 @@ def build_lexicon_from_NB_external(test_file, outfile):
 		build_dict_NB(test_file, classifier, emotion, data)
 		print 'After add NB classifier, the size of data is', len(data)
 
-	#get_lexicon_external_json_to_dict(externalFile, data)
-	#print 'After add external lexicon, the size of data is', len(data)
+	get_lexicon_external_json_to_dict(externalFile, data)
+	print 'After add external lexicon, the size of data is', len(data)
 
 	with open(outfile, 'w') as f:
 		json.dump(data, f, indent = 2)

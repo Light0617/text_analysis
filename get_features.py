@@ -15,9 +15,7 @@ from nltk.tree import *
 from get_story import *
 
 ## for self.lexicon file
-LEXICON_FILE1 = 'lexicon/sad_lexicon'
-LEXICON_FILE2 = 'lexicon/pos_lexicon'
-LEXICON_FILE3 = 'lexicon/neg_lexicon'
+LEXICON = 'lexicon/Semeval_2007/lexicon.json'
 class word_processor():
 	## store word with sad emotion and {word: np.array with its score}
 	## since the original vector contains positive, negtive, surprise,trust, so we remove them and do normalization
@@ -35,8 +33,6 @@ class word_processor():
 		#self.LEXICON_FILE1 = os.getcwd() + '/' + 'lexicon/sad_lexicon'
 		#self.LEXICON_FILE2 = os.getcwd() + '/' + 'lexicon/pos_lexicon'
 		#self.LEXICON_FILE3 = os.getcwd() + '/' + 'lexicon/neg_lexicon'
-
-
 		arguments = {}
 		arguments['--jar']	= path + 'stanford-parser/stanford-parser.jar'
 		arguments['--modeljar']	= path + 'stanford-parser/stanford-parser-3.8.0-models.jar'
@@ -45,69 +41,24 @@ class word_processor():
 		self.dependency_parser = StanfordDependencyParser(model_path=arguments['--model'], path_to_models_jar=arguments['--modeljar'], path_to_jar=arguments['--jar'])
 
 		self.tokenizer = WordPunctTokenizer()	
+		self.lexicon = self.build_dictionary(LEXICON) 
+		print len(self.lexicon)
 
-		self.build_sadness_dictionary()
-		self.build_pos_dictionary()
-		self.build_neg_dictionary()
+	def build_dictionary(self, infile):
+		with open(infile, 'r') as json_file:
+			return json.load(json_file)
 
-	def build_sadness_dictionary(self):
-		#self.build_dictionary(self.LEXICON_FILE1, 'sad')
-		self.build_dictionary(LEXICON_FILE1, 'sad')
-	
-	def build_pos_dictionary(self):
-		#self.build_dictionary(self.LEXICON_FILE2, 'pos')
-		self.build_dictionary(LEXICON_FILE2, 'pos')
-
-	def build_neg_dictionary(self):
-		#self.build_dictionary(self.LEXICON_FILE3, 'neg')
-		self.build_dictionary(LEXICON_FILE3, 'neg')
-
-	def build_dictionary(self, infile, label):
-		with open(infile, 'r') as infile:
-			for line in infile.readlines():		
-				w, prob = line.split(',')
-				if w not in self.lexicon:
-					self.lexicon[w] = {}
-				self.lexicon[w][label] = float(prob)
-
-	def check_sad(self, w):
-		if w not in self.lexicon or 'sad' not in self.lexicon[w] or self.lexicon[w]['sad'] == 0:
-			return False
+	def check_emotion_word(self, w, emotion):
+		if w not in self.lexicon or emotion not in self.lexicon[w]\
+				 or self.lexicon[w][emotion] == 0:
+			return 0
 		else:
-			return True
+			return 1
 
-	def check_neg(self, w):
-		if w not in self.lexicon or 'neg' not in self.lexicon[w] or self.lexicon[w]['neg'] == 0:
-			return False
-		else:
-			return True
-
-	def check_pos(self, w):
-		if w not in self.lexicon or 'pos' not in self.lexicon[w] or self.lexicon[w]['pos'] == 0:
-			return False
-		else:
-			return True
-
-
-	def get_sadness_score_word(self, w):
-		if not self.check_sad(w):
+	def get_emotion_score_word(self, w, emotion):
+		if not self.check_emotion_word(w, emotion):
 			return 0
-		return self.lexicon[w]['sad']
-	
-	def get_is_sad_word(self, w):
-		if not self.check_sad(w):
-			return 0
-		return 1
-
-	def get_is_negative_word(self, w):
-		if not self.check_neg(w):
-			return 0
-		return 1
-
-	def get_is_positive_word(self, w):
-		if not self.check_pos(w):
-			return 0
-		return 1
+		return self.lexicon[w][emotion]
 
 	def normalize(self, sentence):
 		if not isinstance(sentence, unicode):
@@ -117,27 +68,29 @@ class word_processor():
 						and len(wn.synsets(x)) > 0])
 
 	#emotion feature
-	def get_emotion_word_feature(self, sentence):
+	def get_emotion_word_feature(self, sentence, emotion):
 		sentence = ' '.join([x for x in  sentence.split(' ') if x not in stopwords.words('english') and len(x) > 1])
 		items = word_tokenize(sentence)
-		sad, neg, sad_score = 0, 0, -10
+		emotion, neg, pos, emotion_score = 0, 0, 0, -10
 		#print items
 		for word in items:
 			if word in self.lexicon:
-				sad = max(self.get_is_sad_word(word), sad)
-				neg = max(self.get_is_negative_word(word), neg)
-				sad_score = max(self.get_sadness_score_word(word), sad_score)
-		sad_score = sad_score if sad_score != -10 else 0
-		return [sad, neg, sad_score]
+				emotion = max(self.check_emotion_word(word, emotion), emotion)
+				neg = max(self.check_emotion_word(word, 'neg'), neg)
+				pos = max(self.check_emotion_word(word, 'pos'), pos)
+				emotion_score = max(self.get_emotion_score_word(word, emotion),\
+									 emotion_score)
+		emotion_score = emotion_score if emotion_score != -10 else 0
+		return [emotion, pos, neg, emotion_score]
 	
 	##POS feature
-	def get_pos_feature(self, sentence):
+	def get_pos_feature(self, sentence, emotion):
 		items = self.pos_tagger.tag(word_tokenize(sentence))
 		flag_adj, flag_adv = 0, 0
 		neighbor_pos = []
 		for i in range(len(items)):
 			word, pos = items[i]
-			if self.check_sad(word):
+			if self.check_emotion_word(word, emotion):
 				flag_adj = 1 if 'JJ' in pos else 0
 				flag_adv = 1 if 'RB' in pos else 0
 				neighbors = [items[k] if k >= 0 and k < len(items) else [] for k in [i-2, i-1, i+1, i+2] ] 
@@ -165,10 +118,8 @@ class word_processor():
 	def pos_to_list(self, neighbor_pos):
 		list = [self.pos_mapping(pos) for pos in neighbor_pos]
 		array, k = [0] * (36 * 4), 0
-		#print neighbor_pos
 		for num in list:
 			if num >= 0:
-				#print num, k + num 
 				array[k + num] = 1
 			k += 36
 		return array
@@ -187,7 +138,7 @@ class word_processor():
 				    possible_adj += str(ps.name()),
 		return possible_adj[0] if len(possible_adj) > 0 else w
 
-	def get_dependency_features(self, sentence):
+	def get_dependency_features(self, sentence, emotion):
 		features = [0]  * 13
 		try:
 			dep = list(self.dependency_parser.raw_parse(sentence).next().triples())
@@ -204,71 +155,87 @@ class word_processor():
 				modified = self.convert2_adj(modified)	
 			#print rel, modifying, modified, pos1, pos2
 
-			if rel == 'neg' and self.check_sad(modified):
+			if rel == 'neg' and self.check_emotion_word(modified, emotion):
 				#print 1, modifying, modified
 				features[0] = 1
 	
-			if rel == 'amod' and self.check_sad(modified):
+			if rel == 'amod' and self.check_emotion_word(modified, emotion):
 				#print 21, modifying, modified	
 				features[1] = 1
 			 
-			if rel == 'amod' and self.check_sad(modifying):
+			if rel == 'amod' and self.check_emotion_word(modifying, emotion):
 				#print 22, modifying, modified
 				features[2] = 1
 
-			if rel == 'advmod' and self.check_sad(modified):
+			if rel == 'advmod' and self.check_emotion_word(modified, emotion):
 				#print 31, modifying, modified	
 				features[3] = 1
 
-			if rel == 'advmod' and self.check_sad(modifying):
+			if rel == 'advmod' and self.check_emotion_word(modifying, emotion):
 				#print 32, modifying, modified	
 				features[4] = 1
-			
-			if rel == 'amod'  and self.check_sad(modifying) and self.check_pos(modified):
+
+			#emotion pos
+			if rel == 'amod'  and self.check_emotion_word(modifying, emotion)\
+						 and self.check_emotion_word(modified, 'pos'):
 				#print 41, modifying, modified
 				features[5] = 1
-			
-			if rel == 'amod'  and self.check_pos(modifying) and self.check_sad(modified):
+
+			#pos emotion						
+			if rel == 'amod'  and self.check_emotion_word(modifying, 'pos') \
+						and self.check_emotion_word(modified, emotion):
 				#print 42, modifying, modified
 				features[6] = 1
 
-			if rel == 'amod' and self.check_sad(modifying) and self.check_neg(modified):
+			#emotion neg
+			if rel == 'amod' and self.check_emotion_word(modifying, emotion) \
+						and self.check_emotion_word(modified, 'neg'):
 				#print 51, modifying, modified
 				features[7] = 1
 
-			if rel == 'amod' and self.check_neg(modifying) and self.check_sad(modified):
+			#neg emotion
+			if rel == 'amod' and self.check_emotion_word(modifying, 'neg') \
+						and self.check_emotion_word(modified, emotion):
 				#print 52, modifying, modified
 				features[8] = 1
 			
-			if rel == 'advmod'  and self.check_sad(modifying) and self.check_pos(modified):
+			#emotion pos
+			if rel == 'advmod'  and self.check_emotion_word(modifying, emotion) \
+						and self.check_emotion_word(modified, 'pos'):
 				#print 61, modifying, modified
 				features[9] = 1
 			
-			if rel == 'advmod'  and self.check_pos(modifying) and self.check_sad(modified):
+			#pos emotion
+			if rel == 'advmod'  and self.check_emotion_word(modifying, 'pos') \
+						and self.check_emotion_word(modified, emotion):
 				#print 62, modifying, modified
 				features[10] = 1
 
-			if rel == 'advmod' and self.check_sad(modifying) and self.check_neg(modified):
+			#emotion neg
+			if rel == 'advmod' and self.check_emotion_word(modifying, emotion) \
+						and self.check_emotion_word(modified, 'neg'):
 				#print 71, modifying, modified
 				features[11] = 1
 
-			if rel == 'advmod' and self.check_neg(modifying) and self.check_sad(modified):
+			#neg emotion
+			if rel == 'advmod' and self.check_emotion_word(modifying, 'neg') \
+						and self.check_sad(modified, emotion):
 				#print 72, modifying, modified
 				features[12] = 1
 
 		return features
 
 	def test_lexicon(self):
-		for key in self.lexicon_sad:
+		for key in self.lexicon:
 			print key, len(key), type(key)
-			print self.lexicon_sad[key], type(self.lexicon_sad[key])
+			print self.lexicon[key], type(self.lexicon[key])
 	
-	def get_features1(self, sentence):
+	def get_features1(self, sentence, emotion):
 		sentence = self.normalize(sentence)
 		#print sentence
 		vec =  [1] + self.negation_detect(sentence)  + [self.get_number_word_sentence(sentence)] \
-				+ self.get_emotion_word_feature(sentence) + self.get_pos_feature(sentence) \
-				+ self.get_dependency_features(sentence)
+				+ self.get_emotion_word_feature(sentence, emotion) + self.get_pos_feature(sentence, emotion) \
+				+ self.get_dependency_features(sentence, emotion)
 		#print len(vec)
 		return vec
 	def get_feature_baseline(self, sentence):
@@ -299,13 +266,13 @@ if __name__ == '__main__':
 	#strs  = ["The dog terribly ran.", "The scold dog ran.",'I have a scold scholar.', 'I have a scold hardness.']
 	#strs  = ["The dog terribly ran."]
 	#strs  = [""]
-	strs  = ["I hate a dog."]
+	strs = [''.join(x.split(',')[:-1]) for x in open('train1', 'r').readlines()]
+	#strs  = ["I hate a dog."]
 	for s in strs:
 		print '================'
 		print s
 		#print wp.get_dependency_features(s)
-		v = wp.get_features1(s)
+		v = wp.get_features1(s, 'sad')
 		print len(v), v
-		break
 	
 
