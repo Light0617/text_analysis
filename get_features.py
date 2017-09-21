@@ -30,9 +30,6 @@ class word_processor():
 		MODEL = path + 'stanford-postagger/models/english-left3words-distsim.tagger'
 		self.pos_tagger = StanfordPOSTagger(MODEL, JAR, encoding='utf8')
 
-		#self.LEXICON_FILE1 = os.getcwd() + '/' + 'lexicon/sad_lexicon'
-		#self.LEXICON_FILE2 = os.getcwd() + '/' + 'lexicon/pos_lexicon'
-		#self.LEXICON_FILE3 = os.getcwd() + '/' + 'lexicon/neg_lexicon'
 		arguments = {}
 		arguments['--jar']	= path + 'stanford-parser/stanford-parser.jar'
 		arguments['--modeljar']	= path + 'stanford-parser/stanford-parser-3.8.0-models.jar'
@@ -219,7 +216,7 @@ class word_processor():
 
 			#neg emotion
 			if rel == 'advmod' and self.check_emotion_word(modifying, 'neg') \
-						and self.check_sad(modified, emotion):
+						and self.check_emotion_word(modified, emotion):
 				#print 72, modifying, modified
 				features[12] = 1
 

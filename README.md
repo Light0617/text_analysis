@@ -54,6 +54,23 @@ Since getting features is very slow, we store the features in the pickles.
 It records the performances among different data size and different models.
 for all data(training : 8982, testing : 3848), our result is 0.57 accuracy rate over Naive Bayes 0.5
 
+- for Semval data (training : 987, testing : 241)
+- joy
+our result is 0.614 accuracy rate over Naive Bayes 0.5
+- sad
+our result is 0.705 accuracy rate over Naive Bayes 0.5
+- disgust
+our result is 0.639 accuracy rate over Naive Bayes 0.5
+- anger
+our result is 0.656 accuracy rate over Naive Bayes 0.5
+- surprise
+our result is 0.573 accuracy rate over Naive Bayes 0.5
+- fear
+our result is 0.618 accuracy rate over Naive Bayes 0.5
+
+
+
+
 
 ### OTHER
 - wordnet-1.6/
