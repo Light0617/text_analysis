@@ -27,11 +27,12 @@ def predict_text(text, lexicon, wp, classifiers):
 		if not none_word_in_lexicon:
 			score = predict_sentence(wp, classifiers, sentence, EMOTIONS)
 			for i in range(len(EMOTIONS)):
-				if len(emotions_score[i]) >= num_sentence // 2:
+				if len(emotions_score[i]) > 2 and \
+					len(emotions_score[i]) >= num_sentence // 2:
 					heapq.heappop(emotions_score[i])
 				heapq.heappush(emotions_score[i], score[i])				
 	emotions_score = np.array(emotions_score)							
-	return np.mean(emotions_score, axis = 1)
+	return np.mean(emotions_score, axis = 1).tolist()
 
 def load_json(in_file):
 	with open(in_file, 'r') as json_file:
@@ -39,15 +40,32 @@ def load_json(in_file):
 def load_text(in_file):
 	with open(in_file, 'r') as text_file:
 		return text_file.read()
-lexicon = load_json(LEXICON)
-ml_model = 'logistic'
-path = 'pickled'
-domain = 'Semeval_2007'
-model = 'model1'
-classifiers = {}
-for emotion in EMOTIONS:
-	classifiers[emotion], wp = predict_init(path, domain, model, emotion, ml_model)
 
 
-text = load_text('test_text/ex1')
-print predict_text(text, lexicon, wp, classifiers)
+if __name__ == '__main__':
+	lexicon = load_json(LEXICON)
+	ml_model = 'logistic'
+	path = 'pickled'
+	domain = 'Semeval_2007'
+	model = 'model1'
+	classifiers = {}
+	for emotion in EMOTIONS:
+		classifiers[emotion], wp = predict_init(path, domain, model, emotion, ml_model)
+
+	in_dir_name, out_dir_name = sys.argv[1], sys.argv[2]
+	results, files = [], []
+	for file in os.listdir(in_dir_name):
+		print file
+		text = load_text('%s/%s' % (in_dir_name, file))
+		results.append(predict_text(text, lexicon, wp, classifiers))
+		files.append(file)
+
+	with open('%s_%s_emotion.csv' %(out_dir_name, file), 'wb') as output:
+		wr = csv.writer(output, quoting=csv.QUOTE_ALL)
+		wr.writerow(['file'] + EMOTIONS)
+		for item, f_name in zip(results, files):
+			print item, f_name
+			wr.writerow([f_name] + item)
+
+
+
