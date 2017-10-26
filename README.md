@@ -1,21 +1,29 @@
 # text_analysis
-This is an application for recognition emotion from context.
+This is an application for recognition emotion and polarity from context.
 
 ## How to start to build a model
 1. Go to https://nlp.stanford.edu/software/tagger.shtml, to download the software. (please install version: 3.8.0) 
 2. install nltk
 3. install numpy 
 4. put the 'stanford-parser' and 'stanford-postagger' in the parent dictionary.
-5. python get_features.py  for test
-6. run modeling.ipynb 
 
-## How to use, it will output the average sad emotion given a document.
-1. story1 is the text you want to analyze
-python lib.py story1
+## How to use, it will output the score of different emotions given a document.
+There are two program: one is predicting the emotion and the other is predicting the polarity.<br>
+It will read all files in the input_text/ and output the csv in output_text/<br>
 
-2. use API
-from lib import *
-print predict_emotion_textList(texts)
+for example:<br>
+```
+cd text_analysis/
+'python predict_emotion_text.py input_text/ output_text/'
+```
+
+It will generate a CSV file in the folder: output_text<br>
+<br>
+Also,<br>
+```
+python predict_polarity_text.py input_text/ output_text/
+```
+Because predict_emotion uses the NLTK POS tagger, so it will slow, I separate them.
 
 
 ## INTRODUCTION
@@ -43,11 +51,7 @@ joy, sad, disgust, anger, surprise, fear
 # Lexicon
 1. lexicon.json
 anger,anticipation,disgust,fear,joy,negative,positive,sadness,surprise,trust
- 
 
-### Pickles
-- trained/
-Since getting features is very slow, we store the features in the pickles.
 
 ### Result 
 - result
